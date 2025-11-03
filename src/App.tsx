@@ -24,14 +24,14 @@ function App() {
 
   const [inputToken, setInputToken] = useState("");
   const [inputSiteId, setInputSiteId] = useState("");
+  const [inputGroupId, setInputGroupId] = useState("");
   const [genCheckworkId, setGenCheckworkId] = useState("");
-  const [genClassLessonId, setGenClassLessonId] = useState("");
 
   const [info, setInfo] = useState<UserInfo>();
   const [tokenExp, setTokenExp] = useState(0);
   const [siteList, setSiteList] = useState<Site[]>([]);
   const [goingSiteList, setGoingSiteList] = useState<GoingSite[]>([]);
-  const [goingSiteIdList, setGoingSiteIdList] = useState<number[]>([]);
+  const [goingSiteIdList, setGoingSiteIdList] = useState<string[]>([]);
 
   const commonStyle = {
     minHeight: 64,
@@ -55,7 +55,7 @@ function App() {
         updateSiteList();
       })
       .catch((e) => {
-        console.log(e.response.data);
+        console.log(e);
         Toast.error(e.response.data.message);
       });
   };
@@ -67,7 +67,7 @@ function App() {
         setSiteList(r.data.data.records);
       })
       .catch((e) => {
-        console.log(e.response.data);
+        console.log(e);
         Toast.error(e.response.data.message);
       });
   };
@@ -85,10 +85,10 @@ function App() {
     )
       .then((r) => {
         setGoingSiteList(r.data.data);
-        setGoingSiteIdList(r.data.data.map((t: Site) => t.id));
+        setGoingSiteIdList(r.data.data.map((t: GoingSite) => t.siteId));
       })
       .catch((e) => {
-        console.log(e.response.data);
+        console.log(e);
         Toast.error(e.response.data.message);
       });
   };
@@ -108,7 +108,7 @@ function App() {
     };
   }, []);
 
-  const autoSign = (siteId: string) => {
+  const autoSign = (siteId: string, groupId: string) => {
     if (!info?.id) return;
     getCheckoutBasic(siteId)
       .then((r) => {
@@ -117,22 +117,15 @@ function App() {
           Toast.error("未找到签到ID");
           return;
         }
-        const classLessonId = r.data.data.attendanceSiteClassList[0].id;
-        if (!classLessonId) {
-          Toast.error("未找到课堂ID");
-          return;
-        }
         getAttendanceEncryptionParam().then((r) => {
           const clockV2 = r.data.data.data;
-          sign(attendanceId, siteId, info.id, classLessonId, clockV2).then(
-            () => {
-              Toast.success("签到成功");
-            }
-          );
+          sign(attendanceId, siteId, info.id, groupId, clockV2).then(() => {
+            Toast.success("签到成功");
+          });
         });
       })
       .catch((e) => {
-        console.log(e.response.data);
+        console.log(e);
         Toast.error(e.response.data.message);
       });
   };
@@ -211,6 +204,15 @@ function App() {
               setInputSiteId(v);
             }}
           ></Input>
+          <div className="m-2">请输入 GroupId</div>
+          <Input
+            className="m-2"
+            placeholder="GroupId"
+            defaultValue={inputGroupId}
+            onChange={(v) => {
+              setInputGroupId(v);
+            }}
+          ></Input>
           <Button
             className="m-2"
             onClick={() => {
@@ -221,14 +223,6 @@ function App() {
               Toast.info("正在获取签到信息");
               getCheckoutBasic(inputSiteId)
                 .then((r) => {
-                  const classLessonId =
-                    r.data.data.attendanceSiteClassList?.[0]?.id;
-                  if (!classLessonId) {
-                    Toast.error("未找到课堂ID");
-                    return;
-                  }
-                  setGenClassLessonId(classLessonId);
-
                   const attendanceId = r.data.data.attendanceBasicInfo.id;
                   if (attendanceId <= 0) {
                     Toast.error("未找到签到ID");
@@ -246,12 +240,12 @@ function App() {
           >
             生成
           </Button>
-          {genCheckworkId && genClassLessonId && (
+          {genCheckworkId && inputGroupId && (
             <div className="m-2">
               <CheckCode
                 checkworkId={genCheckworkId}
                 siteId={inputSiteId}
-                classLessonId={genClassLessonId}
+                classLessonId={inputGroupId}
               />
             </div>
           )}
@@ -275,7 +269,7 @@ function App() {
               }
               extra={
                 <Button
-                  disabled={!(item.id in goingSiteIdList)}
+                  disabled={goingSiteIdList.indexOf(item.id) == -1}
                   onClick={() => {
                     const goingSite = goingSiteList.find((v) => {
                       if (v.siteId == item.id) {
@@ -286,7 +280,7 @@ function App() {
                       Toast.error("未找到有效信息");
                       return;
                     }
-                    autoSign(goingSite.siteId);
+                    autoSign(goingSite.siteId, goingSite.groupId);
                   }}
                 >
                   签到
