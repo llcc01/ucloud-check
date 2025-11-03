@@ -4,7 +4,7 @@ axios.defaults.baseURL = "https://apiucloud.bupt.edu.cn";
 
 axios.interceptors.request.use(
   (config) => {
-    const token = sessionStorage.getItem("Blade-Auth");
+    const token = sessionStorage.getItem("token");
     if (token) {
       config.headers.set("Blade-Auth", token);
     }

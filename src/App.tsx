@@ -131,7 +131,12 @@ function App() {
   };
 
   return (
-    <Layout>
+    <Layout
+      style={{
+        maxWidth: 800,
+        margin: "auto",
+      }}
+    >
       <Header style={commonStyle}>
         <div className="flex items-center">
           <Button
@@ -166,7 +171,7 @@ function App() {
           visible={loginVisible}
           onOk={() => {
             // console.log(inputToken);
-            sessionStorage.setItem("Blade-Auth", inputToken);
+            sessionStorage.setItem("token", inputToken);
             checkToken();
           }}
           onCancel={() => {
@@ -174,7 +179,7 @@ function App() {
           }}
           closeOnEsc={true}
         >
-          请填写 Blade-Auth
+          请填写 token (Blade-Auth)
           <Input
             className="mt-2"
             onChange={(v) => {
@@ -204,10 +209,10 @@ function App() {
               setInputSiteId(v);
             }}
           ></Input>
-          <div className="m-2">请输入 GroupId</div>
+          <div className="m-2">请输入 GroupId (ClassLessonId)</div>
           <Input
             className="m-2"
-            placeholder="GroupId"
+            placeholder="GroupId (ClassLessonId)"
             defaultValue={inputGroupId}
             onChange={(v) => {
               setInputGroupId(v);
