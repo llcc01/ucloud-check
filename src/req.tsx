@@ -45,9 +45,10 @@ export const getAttendanceEncryptionParam = () => {
   return axios.get("/ykt-site/common/v2/clock");
 };
 
-export const getCheckoutBasic = (siteId: string) => {
+export const getCheckoutBasic = (siteId: string, groupId: string) => {
   return axios.post("/ykt-site/attendancebasicinfo/basic", {
     siteId: siteId,
+    groupId: groupId
   });
 };
 

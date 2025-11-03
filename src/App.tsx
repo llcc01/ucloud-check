@@ -110,7 +110,7 @@ function App() {
 
   const autoSign = (siteId: string, groupId: string) => {
     if (!info?.id) return;
-    getCheckoutBasic(siteId)
+    getCheckoutBasic(siteId, groupId)
       .then((r) => {
         const attendanceId = r.data.data.attendanceBasicInfo.id;
         if (attendanceId <= 0) {
@@ -221,7 +221,7 @@ function App() {
                 return;
               }
               Toast.info("正在获取签到信息");
-              getCheckoutBasic(inputSiteId)
+              getCheckoutBasic(inputSiteId, inputGroupId)
                 .then((r) => {
                   const attendanceId = r.data.data.attendanceBasicInfo.id;
                   if (attendanceId <= 0) {
