@@ -43,7 +43,7 @@ function App() {
     getUserInfo()
       .then((r) => {
         setInfo(r.data.data);
-        const token = sessionStorage.getItem("Blade-Auth");
+        const token = sessionStorage.getItem("token");
         const data = token?.split(".")[1] ?? "";
         const decodedData = base64Decode(data);
         const jwtPayload = JSON.parse(decodedData);
@@ -84,6 +84,9 @@ function App() {
       })
     )
       .then((r) => {
+        if (!(r.data.data.length > 0)) {
+          r.data.data = [];
+        }
         setGoingSiteList(r.data.data);
         setGoingSiteIdList(r.data.data.map((t: GoingSite) => t.siteId));
       })
@@ -104,7 +107,7 @@ function App() {
       checkToken();
     }
     return () => {
-      console.log("de");
+      // console.log("de");
     };
   }, []);
 
